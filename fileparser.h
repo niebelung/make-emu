@@ -3,23 +3,23 @@
 
 #include <string>
 #include <list>
+#include <memory>
+#include <fstream>
 
-
+#include "target.h"
 
 namespace make_emu
 {
-//TODO Remove forward decl
-class Target;
-
-using Targets = std::list<Target>;
-
 class FileParser
 {
     FileParser(std::string filename);
     virtual ~FileParser(){}
 public:
-    
-    
+    std::shared_ptr<Target> readTarget();
+private:
+    std::shared_ptr<Target> m_currentTarget;
+    std::ifstream           m_infile;
+
 };
 }
 
