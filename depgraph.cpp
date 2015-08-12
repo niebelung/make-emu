@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <sstream>
+#include <iostream>
 
 namespace make_emu
 {
@@ -10,7 +11,7 @@ Node::Node(Target * target)
     m_target = std::shared_ptr<Target>(target);
 }
 
-const std::list<std::string> & Node::getAdjacent() const
+std::list< std::string > Node::getAdjacent() const
 {
     return m_target->dependencies();
 }
@@ -44,6 +45,7 @@ DepGraph::DepGraph()
 
 void DepGraph::addNode(const std::string& key, std::shared_ptr< make_emu::Target > target)
 {
+
     if(key.empty())
     {
         std::stringstream ss;
@@ -58,7 +60,6 @@ void DepGraph::addNode(const std::string& key, std::shared_ptr< make_emu::Target
         throw ss.str();
     }
     m_root->data()->addDependency(key);
-    
 }
 
 bool DepGraph::isOnStack(const std::string & key)
@@ -78,9 +79,14 @@ bool DepGraph::isCyclic(std::shared_ptr<Node> node)
     node->visit();
     m_stack->push_back(node->name());
 
-    for(auto & name : node->getAdjacent())
+    auto names = node->getAdjacent();
+    for(auto & name : names)
     {
+        //TEST
+        std::cout << name << std::endl;
         auto adj = m_nodes->find(name);
+//         //TEST
+//         std::cout << name << std::endl;
 
         if(adj == m_nodes->end())
         {
@@ -88,15 +94,21 @@ bool DepGraph::isCyclic(std::shared_ptr<Node> node)
             ss << "Missing dependency  " << name << " for target " << node->name() << "!!!";
             throw ss.str();
         }
+//         //TEST
+//         std::cout << name << std::endl;
 
         if(!adj->second->isVisited())
         {
+        //TEST
+        std::cout << "foo" << std::endl;
             return isCyclic(adj->second);
         }
         else if (isOnStack(adj->first))
         {
             return true;
         }
+        //TEST
+        std::cout << "bar" << std::endl;
     }
 
     m_stack->pop_back();
@@ -127,7 +139,7 @@ bool DepGraph::applyOperation(
         ss << "Target key empty!";
         throw ss.str();
     }
-    
+
     auto node = m_nodes->find(key);
     if(node == m_nodes->end())
     {

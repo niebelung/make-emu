@@ -14,7 +14,7 @@ class Node
 {
 public:
     Node(Target * node);
-    const std::list<std::string> & getAdjacent() const;
+    std::list<std::string> getAdjacent() const;
     bool isVisited() const;
     void visit();
     std::string name() const;

@@ -2,11 +2,10 @@
 
 namespace make_emu
 {
-    
+
 Target::Target(std::string name) :
     m_name(name)
 {
-    
 }
 
 void Target::addAction(Action * action)
@@ -44,8 +43,10 @@ const std::string & Target::name() const
     return m_name;
 }
 
-const std::list<std::string> & Target::dependencies() const
+std::list<std::string> Target::dependencies() const
 {
+    //TEST
+    std::printf("m_deps.name() -> %s\n",(m_deps.begin())->c_str());
     return m_deps;
 }
 const std::list< std::shared_ptr<Action>>& Target::actions() const

@@ -37,7 +37,6 @@ private:
     };
 
     std::shared_ptr<Target>            m_currentTarget;
-    std::list<std::shared_ptr<Target>> m_targets;
     std::string                        m_currentLine;
     std::ifstream                      m_infile;
     State                              m_state {State::INIT};
