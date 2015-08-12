@@ -14,7 +14,7 @@ private:
     ActionProcessor& operator=( ActionProcessor& ) = delete;
 public:
     static ActionProcessor * instance();
-    void execute(Action & action);
+    void execute(const make_emu::Action& action);
 private:
     static ActionProcessor * m_instance;
 };

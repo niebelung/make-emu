@@ -1,12 +1,13 @@
 #include "depgraph.h"
 
 #include <stdexcept>
+#include <sstream>
 
 namespace make_emu
 {
 Node::Node(Target * target)
 {
-    m_target = std::shared_ptr<Target> p(target);
+    m_target = std::shared_ptr<Target>(target);
 }
 
 const std::list<std::string> & Node::getAdjacent() const
@@ -29,25 +30,40 @@ std::string Node::name() const
     return m_target->name();
 }
 
-std::shared_ptr<Target> Node::data(const std::string & key)
+std::shared_ptr<Target> Node::data()
 {
     return m_target;
 }
 
 
-void DepGraph::addNode(const std::string & key, Node * node)
+DepGraph::DepGraph()
 {
-    auto res = m_nodes.insert(std::make_pair(key,std::shared_ptr<Node>(node)));
+    m_root = std::make_shared<Node>(new Target(std::string()));
+    m_nodes->insert(std::make_pair(std::string(), m_root));
+}
+
+void DepGraph::addNode(const std::string& key, std::shared_ptr< make_emu::Target > target)
+{
+    if(key.empty())
+    {
+        std::stringstream ss;
+        ss << "Target key empty!";
+        throw ss.str();
+    }
+    auto node = std::make_shared<Node>(target.get());
+    auto res = m_nodes->insert(std::make_pair(key, node));
     if ( ! res.second ) {
         std::stringstream ss;
         ss << "Target " << key << " duplicated!";
         throw ss.str();
     }
+    m_root->data()->addDependency(key);
+    
 }
 
 bool DepGraph::isOnStack(const std::string & key)
 {
-    for(auto & item : m_stack)
+    for(auto & item : *m_stack.get())
     {
         if(!item.compare(key))
         {
@@ -73,11 +89,11 @@ bool DepGraph::isCyclic(std::shared_ptr<Node> node)
             throw ss.str();
         }
 
-        if(!adj.second->isVisited())
+        if(!adj->second->isVisited())
         {
-            return isCyclic(adj.second);
+            return isCyclic(adj->second);
         }
-        else if (isOnStack(adj.second))
+        else if (isOnStack(adj->first))
         {
             return true;
         }
@@ -89,12 +105,9 @@ bool DepGraph::isCyclic(std::shared_ptr<Node> node)
 
 bool DepGraph::isCyclic()
 {
-    for(auto & node : m_nodes)
+    if(isCyclic(m_root))
     {
-        if(isCyclic(node.second))
-        {
-            return true;
-        }
+        return true;
     }
     return false;
 }
@@ -106,8 +119,15 @@ bool DepGraph::isConsistent()
 
 bool DepGraph::applyOperation(
     const std::string & key,
-    std::function<bool(std::shared_ptr<Node>)> f)
+    std::function<bool(Target&)> f)
 {
+    if(key.empty())
+    {
+        std::stringstream ss;
+        ss << "Target key empty!";
+        throw ss.str();
+    }
+    
     auto node = m_nodes->find(key);
     if(node == m_nodes->end())
     {
@@ -116,7 +136,7 @@ bool DepGraph::applyOperation(
         throw ss.str();
     }
 
-    for(auto & name : node->getAdjacent())
+    for(auto & name : node->second->getAdjacent())
     {
         if(!applyOperation(name,f))
         {
@@ -124,7 +144,7 @@ bool DepGraph::applyOperation(
         }
     }
 
-    return f(node->data());
+    return f(*node->second->data().get());
 }
 
 }

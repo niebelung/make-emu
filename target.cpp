@@ -39,7 +39,7 @@ void Target::addDependency(const std::string & name)
 //     return true;
 // }
 
-const std::string Target::name() const
+const std::string & Target::name() const
 {
     return m_name;
 }
@@ -47,6 +47,10 @@ const std::string Target::name() const
 const std::list<std::string> & Target::dependencies() const
 {
     return m_deps;
+}
+const std::list< std::shared_ptr<Action>>& Target::actions() const
+{
+    return m_actions;
 }
 
 }

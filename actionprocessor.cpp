@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <string>
+#include <sstream>
 
 namespace make_emu
 {
@@ -10,7 +11,7 @@ ActionProcessor::ActionProcessor()
 {
     if (std::system(nullptr))
     {
-        std::printf("Command interpreter is available!");
+        std::printf("Command interpreter is available!\n");
     }
     else
     {
@@ -29,7 +30,7 @@ ActionProcessor * ActionProcessor::instance()
     return m_instance;
 }
 
-void ActionProcessor::execute(Action& action)
+void ActionProcessor::execute(const Action& action)
 {
     if (std::system(action.toString().c_str()))
     {

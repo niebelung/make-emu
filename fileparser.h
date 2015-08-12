@@ -12,29 +12,37 @@ namespace make_emu
 {
 class FileParser
 {
+public:
     FileParser(std::string filename);
     virtual ~FileParser(){}
-public:
-    std::shared_ptr<Target> readTarget();
+    std::list<std::shared_ptr<Target>> readTargets();
 
 private:
-    std::list<std::string> tokenize(std::string s);
+    void processHeader();
+    void processActions();
+    void processError();
+    bool containsHeader(std::string & s);
+    bool containsNothing(std::string & s);
+    bool containsAction(std::string & s);
 
 private:
 
     enum class State
     {
         INIT,
-        IDLE,
-        TARGET,
-        DEPS,
-        ACTIONS
+        HEADER,
+        ACTIONS,
+        DONE,
+        ERROR
     };
 
-    std::shared_ptr<Target> m_currentTarget;
-    std::string             m_currentLine;
-    std::ifstream           m_infile;
-    State                   m_state {State::INIT};
+    std::shared_ptr<Target>            m_currentTarget;
+    std::list<std::shared_ptr<Target>> m_targets;
+    std::string                        m_currentLine;
+    std::ifstream                      m_infile;
+    State                              m_state {State::INIT};
+    int                                m_lineCount{0};
+    bool                               m_good{true};
 
 };
 }
