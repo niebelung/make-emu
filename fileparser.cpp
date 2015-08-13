@@ -46,8 +46,6 @@ void FileParser::processHeader()
             {
                 continue;
             }
-            //TEST
-            std::printf("token : %s!\n",token.c_str());
             m_currentTarget->addDependency(token);
         }
 
@@ -72,26 +70,22 @@ void FileParser::processActions()
 {
     if(containsAction(m_currentLine))
     {
-        std::printf("containsAction(m_currentLine) -> true\n");
         std::size_t found = m_currentLine.find_first_not_of(" \t");
         m_currentTarget->addAction(new Action(m_currentLine.substr(found)));
         m_currentLine.clear();
     }
     else if(containsNothing(m_currentLine))
     {
-        std::printf("containsNothing(m_currentLine) -> true\n");
         m_currentLine.clear();
         return;
     }
     else if(containsHeader(m_currentLine))
     {
-        std::printf("containsHeader(m_currentLine) -> true\n");
         m_state = State::DONE;
         return;
     }
     else
     {
-        std::printf("else\n");
         m_state = State::ERROR;
         return;
     }
@@ -157,15 +151,11 @@ std::list< std::shared_ptr< Target > > FileParser::readTargets()
     std::list<std::shared_ptr<Target>> targets;
     while(m_good)
     {
-        std::printf("state %d line empty %d\n",m_state,m_currentLine.empty());
-//         sleep(1);
         if(m_currentLine.empty())
         {
             ++m_lineCount;
             if(!std::getline(m_infile,m_currentLine))
             {
-                std::printf("newly read line %s\n",m_currentLine.c_str());
-//                 m_good = false;
                 break;
             }
         }

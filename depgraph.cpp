@@ -6,9 +6,9 @@
 
 namespace make_emu
 {
-Node::Node(Target * target)
+Node::Node(std::shared_ptr<Target> target)
 {
-    m_target = std::shared_ptr<Target>(target);
+    m_target = target;
 }
 
 std::list< std::string > Node::getAdjacent() const
@@ -39,7 +39,7 @@ std::shared_ptr<Target> Node::data()
 
 DepGraph::DepGraph()
 {
-    m_root = std::make_shared<Node>(new Target(std::string()));
+    m_root = std::make_shared<Node>(std::make_shared<Target>(std::string()));
     m_nodes->insert(std::make_pair(std::string(), m_root));
 }
 
@@ -52,7 +52,7 @@ void DepGraph::addNode(const std::string& key, std::shared_ptr< make_emu::Target
         ss << "Target key empty!";
         throw ss.str();
     }
-    auto node = std::make_shared<Node>(target.get());
+    auto node = std::make_shared<Node>(target);
     auto res = m_nodes->insert(std::make_pair(key, node));
     if ( ! res.second ) {
         std::stringstream ss;
@@ -82,11 +82,7 @@ bool DepGraph::isCyclic(std::shared_ptr<Node> node)
     auto names = node->getAdjacent();
     for(auto & name : names)
     {
-        //TEST
-        std::cout << name << std::endl;
         auto adj = m_nodes->find(name);
-//         //TEST
-//         std::cout << name << std::endl;
 
         if(adj == m_nodes->end())
         {
@@ -94,21 +90,18 @@ bool DepGraph::isCyclic(std::shared_ptr<Node> node)
             ss << "Missing dependency  " << name << " for target " << node->name() << "!!!";
             throw ss.str();
         }
-//         //TEST
-//         std::cout << name << std::endl;
 
         if(!adj->second->isVisited())
         {
-        //TEST
-        std::cout << "foo" << std::endl;
-            return isCyclic(adj->second);
+            if(isCyclic(adj->second))
+            {
+                return true;
+            }
         }
         else if (isOnStack(adj->first))
         {
             return true;
         }
-        //TEST
-        std::cout << "bar" << std::endl;
     }
 
     m_stack->pop_back();
@@ -130,16 +123,9 @@ bool DepGraph::isConsistent()
 }
 
 bool DepGraph::applyOperation(
-    const std::string & key,
-    std::function<bool(Target&)> f)
+    std::function<bool(Target&)> f,
+    const std::string & key)
 {
-    if(key.empty())
-    {
-        std::stringstream ss;
-        ss << "Target key empty!";
-        throw ss.str();
-    }
-
     auto node = m_nodes->find(key);
     if(node == m_nodes->end())
     {
@@ -150,13 +136,16 @@ bool DepGraph::applyOperation(
 
     for(auto & name : node->second->getAdjacent())
     {
-        if(!applyOperation(name,f))
+        if(!applyOperation(f,name))
         {
             return false;
         }
     }
-
-    return f(*node->second->data().get());
+    if(m_root != node->second)
+    {
+        return f(*node->second->data().get());
+    }
+    return true;
 }
 
 }

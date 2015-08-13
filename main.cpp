@@ -7,7 +7,7 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
-    if(argc != 2)
+    if(argc != 2 && argc !=1)
     {
         std::cout << "Wrong args num : " << argc - 1 << std::endl;
         return EXIT_FAILURE;
@@ -28,28 +28,34 @@ int main(int argc, char **argv) {
 
     if(depGraph.isCyclic())
     {
-        std::cout << "Cyclic dependencies detected!"<< std::endl;
+        std::cout << "ERROR! Cyclic dependencies detected!"<< std::endl;
         return EXIT_FAILURE;
     }
 
-    std::cout << "bla" << std::endl;
+    auto arg = (argc == 2) ? std::string(argv[1]) : std::string();
 
     depGraph.applyOperation(
-        std::string(argv[1]),
         [&](make_emu::Target & target)
         {
+            if(target.isProcessed())
+            {
+                return true;
+            }
+            std::cout << "\"" << target.name() << "\" :" << std::endl;
             for(auto & action : target.actions())
             {
                 actionProcessor->execute(*action.get());
             }
+            target.markProcessed();
             return true;
-        });
+        },
+        arg);
 
 
     }
     catch(std::string & e)
     {
-           std::cout << e << std::endl;
+           std::cout << "ERROR! " << e << std::endl;
     }
 
 }
