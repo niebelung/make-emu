@@ -7,8 +7,6 @@
 #include <cstdlib>
 #include <unistd.h>
 
-#include <iostream>
-
 namespace make_emu
 {
 FileParser::FileParser(std::string filename) :
