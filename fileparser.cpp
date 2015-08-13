@@ -7,12 +7,21 @@
 #include <cstdlib>
 #include <unistd.h>
 
+#include <iostream>
+
 namespace make_emu
 {
 FileParser::FileParser(std::string filename) :
     m_infile(filename),
     m_currentTarget(nullptr)
-{}
+{
+        if(!m_infile.good())
+        {
+            std::stringstream ss;
+            ss << "No file to parse. Please provide Makefile!";
+            throw ss.str();
+        }
+}
 
 
 
