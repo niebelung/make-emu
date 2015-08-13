@@ -45,7 +45,12 @@ DepGraph::DepGraph()
 
 void DepGraph::addNode(const std::string& key, std::shared_ptr< make_emu::Target > target)
 {
-
+    if(m_nodeCnt >= MAX_TARGETS)
+    {
+        std::stringstream ss;
+        ss << "Maximum 1000000 targets allowed";
+        throw ss.str();
+    }
     if(key.empty())
     {
         std::stringstream ss;
@@ -60,6 +65,7 @@ void DepGraph::addNode(const std::string& key, std::shared_ptr< make_emu::Target
         throw ss.str();
     }
     m_root->data()->addDependency(key);
+    m_nodeCnt++;
 }
 
 bool DepGraph::isOnStack(const std::string & key)

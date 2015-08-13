@@ -34,12 +34,15 @@ public:
     bool isConsistent();
     bool applyOperation(std::function< bool(Target&) > f,const std::string& key = std::string());
 private:
+    constexpr static int MAX_TARGETS {1000000};
+    
     bool isCyclic(std::shared_ptr<Node> node);
     bool isOnStack(const std::string & key);
 private:
     std::unique_ptr<std::map<std::string, std::shared_ptr<Node>>> m_nodes {new std::map<std::string, std::shared_ptr<Node>>};
     std::unique_ptr<std::vector<std::string>> m_stack {new std::vector<std::string>};
     std::shared_ptr<Node> m_root;
+    int m_nodeCnt{0};
 };
 }
 #endif
