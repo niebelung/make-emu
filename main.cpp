@@ -1,5 +1,5 @@
 #include "fileparser.h"
-#include "depgraph.h"
+#include "depgraph.hpp"
 #include "target.h"
 #include "actionprocessor.h"
 #include "action.h"
@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     make_emu::FileParser parser(std::string("Makefile"));
 
     auto targetList = parser.readTargets();
-    make_emu::DepGraph depGraph;
+    make_emu::DepGraph<make_emu::Target, std::string, 1000000> depGraph;
     for(auto & target : targetList)
     {
         depGraph.addNode(target->name(), target);

@@ -11,14 +11,13 @@ SET(SRC main.cpp
         action.cpp
         fileparser.cpp
         target.cpp
-        depgraph.cpp
         )
 
 SET(HDR actionprocessor.h
         action.h
         fileparser.h
         target.h
-        depgraph.h
+        depgraph.hpp
         )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
