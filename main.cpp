@@ -19,13 +19,25 @@ int main(int argc, char **argv) {
     make_emu::FileParser parser(std::string("Makefile"));
 
     auto targetList = parser.readTargets();
-    make_emu::DepGraph<make_emu::Target, std::string, 1000000> depGraph;
+    make_emu::DepGraph<std::string, make_emu::Target,  1000000> depGraph;
+
+    //Populating the graph with vertices
     for(auto & target : targetList)
     {
         depGraph.addNode(target->name(), target);
+    }
+    
+    //Populating the graph with edges
+    for(auto & target : targetList)
+    {
+        for(auto & depName : target->dependencies())
+        {
+            depGraph.addEdge(target->name(), depName);
+        }
         target.reset();
     }
 
+    //Checking for cycles
     if(depGraph.isCyclic())
     {
         std::cout << "ERROR! Cyclic dependencies detected!"<< std::endl;
@@ -34,6 +46,7 @@ int main(int argc, char **argv) {
 
     auto arg = (argc == 2) ? std::string(argv[1]) : std::string();
 
+    //Recursively executing targets
     depGraph.applyOperation(
         [&](make_emu::Target & target)
         {
@@ -50,8 +63,6 @@ int main(int argc, char **argv) {
             return true;
         },
         arg);
-
-
     }
     catch(std::string & e)
     {
