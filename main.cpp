@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
             std::cout << "\"" << target.name() << "\" :" << std::endl;
             for(auto & action : target.actions())
             {
-                actionProcessor->execute(*action.get());
+                actionProcessor->execute(*action);
             }
             target.markProcessed();
             return true;
