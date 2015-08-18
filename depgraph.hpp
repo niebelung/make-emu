@@ -70,10 +70,10 @@ std::shared_ptr<T> Node<T>::data()
 constexpr static int MAX_TARGETS {1000000};
 
 template <typename Key, typename T, int SIZE = MAX_TARGETS>
-class DepGraph
+class DiGraph
 {
 public:
-    template<typename ... Args> DepGraph(Args ... args);
+    template<typename ... Args> DiGraph(Args ... args);
     void addNode(const Key& key, std::shared_ptr<T> target);
     void addEdge(const Key& from, const Key& to);
     bool isCyclic();
@@ -93,7 +93,7 @@ private:
 
 template <typename Key, typename T, int SIZE>
 template<typename ...Args>
-DepGraph<Key,T,SIZE>::DepGraph(Args... args)
+DiGraph<Key,T,SIZE>::DiGraph(Args... args)
 {
     static_assert(SIZE <= MAX_TARGETS,"Exceeded MAX_TARGETS");
     m_root = std::make_shared<Node<T>>(std::make_shared<T>(args...));
@@ -101,7 +101,7 @@ DepGraph<Key,T,SIZE>::DepGraph(Args... args)
 }
 
 template <typename Key, typename T, int SIZE>
-void DepGraph<Key,T,SIZE>::addNode(const Key& key, std::shared_ptr<T> target)
+void DiGraph<Key,T,SIZE>::addNode(const Key& key, std::shared_ptr<T> target)
 {
     if(m_nodeCnt >= SIZE)
     {
@@ -121,7 +121,7 @@ void DepGraph<Key,T,SIZE>::addNode(const Key& key, std::shared_ptr<T> target)
 }
 
 template <typename Key, typename T, int SIZE>
-void DepGraph<Key,T,SIZE>::addEdge(const Key& from, const Key& to)
+void DiGraph<Key,T,SIZE>::addEdge(const Key& from, const Key& to)
 {
     auto fromNode = m_nodes->find(from);
 
@@ -145,7 +145,7 @@ void DepGraph<Key,T,SIZE>::addEdge(const Key& from, const Key& to)
 }
 
 template <typename Key, typename T, int SIZE>
-bool DepGraph<Key,T,SIZE>::isOnStack(std::shared_ptr<Node<T>> node)
+bool DiGraph<Key,T,SIZE>::isOnStack(std::shared_ptr<Node<T>> node)
 {
     for(auto & item : *m_stack)
     {
@@ -158,7 +158,7 @@ bool DepGraph<Key,T,SIZE>::isOnStack(std::shared_ptr<Node<T>> node)
 }
 
 template <typename Key, typename T, int SIZE>
-bool DepGraph<Key,T,SIZE>::isCyclic(std::shared_ptr<Node<T>> node)
+bool DiGraph<Key,T,SIZE>::isCyclic(std::shared_ptr<Node<T>> node)
 {
     node->visit();
     m_stack->push_back(node);
@@ -184,7 +184,7 @@ bool DepGraph<Key,T,SIZE>::isCyclic(std::shared_ptr<Node<T>> node)
 }
 
 template <typename Key, typename T, int SIZE>
-bool DepGraph<Key,T,SIZE>::isCyclic()
+bool DiGraph<Key,T,SIZE>::isCyclic()
 {
     if(isCyclic(m_root))
     {
@@ -194,13 +194,13 @@ bool DepGraph<Key,T,SIZE>::isCyclic()
 }
 
 template <typename Key, typename T, int SIZE>
-bool DepGraph<Key,T,SIZE>::isConsistent()
+bool DiGraph<Key,T,SIZE>::isConsistent()
 {
     return true;
 }
 
 template <typename Key, typename T, int SIZE>
-bool DepGraph<Key,T,SIZE>::applyOperation(
+bool DiGraph<Key,T,SIZE>::applyOperation(
     std::function< bool(T&) > f,
     std::shared_ptr<Node<T>> node)
 {
@@ -219,7 +219,7 @@ bool DepGraph<Key,T,SIZE>::applyOperation(
 }
 
 template <typename Key, typename T, int SIZE>
-bool DepGraph<Key,T,SIZE>::applyOperation(
+bool DiGraph<Key,T,SIZE>::applyOperation(
     std::function< bool(T&) > f,
     const Key& key)
 {

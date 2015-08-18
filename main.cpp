@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     make_emu::FileParser parser(std::string("Makefile"));
 
     auto targetList = parser.readTargets();
-    make_emu::DepGraph<std::string, make_emu::Target,  1000000> depGraph;
+    make_emu::DiGraph<std::string, make_emu::Target,  1000000> depGraph;
 
     //Populating the graph with vertices
     for(auto & target : targetList)
