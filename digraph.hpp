@@ -221,7 +221,7 @@ bool DiGraph<Key,T,SIZE>::applyOperation(
     }
     if(m_root != node)
     {
-        return f(*node->data().get());
+        return f(*node->data());
     }
     return true;
 }
