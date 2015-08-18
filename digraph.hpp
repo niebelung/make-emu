@@ -19,6 +19,7 @@ class Node
 {
 public:
     Node(std::shared_ptr<T> target);
+    template<typename ... Args> Node(Args ... args);
     void addAdjacent(std::shared_ptr<Node<T>> node);
     std::list<std::shared_ptr<Node<T>>> getAdjacent() const;
     bool isVisited() const;
@@ -35,6 +36,13 @@ template <typename T>
 Node<T>::Node(std::shared_ptr<T> target)
 {
     m_target = target;
+}
+
+template <typename T>
+template<typename ... Args>
+Node<T>::Node(Args ... args)
+{
+    m_target =  std::make_shared<T>(args...);
 }
 
 template <typename T>
@@ -96,7 +104,7 @@ template<typename ...Args>
 DiGraph<Key,T,SIZE>::DiGraph(Args... args)
 {
     static_assert(SIZE <= MAX_TARGETS,"Exceeded MAX_TARGETS");
-    m_root = std::make_shared<Node<T>>(std::make_shared<T>(args...));
+    m_root = std::make_shared<Node<T>>(args...);
     m_nodes->insert(std::make_pair(Key(), m_root));
 }
 
@@ -227,7 +235,7 @@ bool DiGraph<Key,T,SIZE>::applyOperation(
     if(node == m_nodes->end())
     {
         std::stringstream ss;
-        ss << "Unknown target : " << key << "!!!";
+        ss << "Unknown target : \"" << key << "\"!";
         throw ss.str();
     }
     return applyOperation(f,node->second);
