@@ -1,5 +1,5 @@
 #include "fileparser.h"
-#include "depgraph.hpp"
+#include "digraph.hpp"
 #include "target.h"
 #include "actionprocessor.h"
 #include "action.h"
